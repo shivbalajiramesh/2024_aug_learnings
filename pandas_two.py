@@ -7,7 +7,8 @@ os.chdir('C:\\Users\\shivbalaji.ramesh\\OneDrive - CES Limited\\Desktop\\python\
 #print(os.getcwd())
 
 import pandas as pd
-
+import numpy as np
+from openpyxl import Workbook as wb
 df = pd.read_csv('survey_results_public.csv')
 #print(type(df.shape))
 #print(df.info())
@@ -31,6 +32,15 @@ my_dict = {
 }
 
 small_df = pd.DataFrame(my_dict)
+
+people = {
+    'first': ['Corey', 'Jane', 'John', 'Chris', np.nan, None, 'NA'], 
+    'last': ['Schafer', 'Doe', 'Doe', 'Schafer', np.nan, np.nan, 'Missing'], 
+    'email': ['CoreyMSchafer@gmail.com', 'JaneDoe@email.com', 'JohnDoe@email.com', None, np.nan, 'Anonymous@email.com', 'NA'],
+    'age': ['33', '55', '63', '36', None, None, 'Missing']
+}
+
+people_df = pd.DataFrame(people)
 
 print('\nHello World!\n')
 '''
@@ -231,14 +241,160 @@ print(small_df)
 print(small_df.sort_values(by = ['Last', 'First'], ascending = [False, True]))
 
 #print(small_df.sort_index(ascending=True, axis=1))
-'''
 
 
-#print(df.sort_values(by = ['Country', 'ConvertedComp'], ascending=True)[['Country', 'ConvertedComp']])
+
+print(df.sort_values(by = ['Country', 'ConvertedComp'], ascending=True)[['Country', 'ConvertedComp']])
 
 
-#print(df['ConvertedComp'].nlargest(10))
+print(df['ConvertedComp'].nlargest(10))
 
-#print(df.nlargest(10, 'ConvertedComp'))
+print(df.nlargest(10, 'ConvertedComp'))
 
 print(df.nsmallest(10, 'ConvertedComp'))
+
+
+print(df.head())
+
+print(df['ConvertedComp'].mean())
+
+print(df.groupby(by = 'Hobbyist')['ConvertedComp'])
+
+print(df.groupby(by = 'Hobbyist')['ConvertedComp'].mean())
+
+print(df['ConvertedComp'].describe())
+
+print(df['Hobbyist'].count())
+print(df['Hobbyist'].value_counts())
+
+print(df['SocialMedia'].value_counts())
+
+print(df.columns)
+
+print(df['SocialMedia'].value_counts(normalize=True))
+
+print(df.groupby(by='Country'))
+print(df.groupby(by='Country').get_group('United States')['ConvertedComp'])
+print(df.groupby(by='Country').get_group('United States')['ConvertedComp'].mean())
+print(df.groupby(by='Country').get_group('United States')[['ConvertedComp', 'Age']].mean())
+
+print(df.groupby(by='Country')['SocialMedia'].value_counts())
+print(df.groupby(by='Country')['ConvertedComp'].agg(['mean', 'median']))
+print(df.groupby(by='Country')['ConvertedComp'].agg(['mean', 'median']).loc[['India', 'United States']])
+
+print(df['LanguageWorkedWith'].head(50))
+
+print(df['LanguageWorkedWith'].str.contains('python', case = False))
+
+print(df['LanguageWorkedWith'].str.contains('python', case = False).value_counts())
+
+print(df.loc[df['LanguageWorkedWith'].str.contains('python', case = False).fillna(False)])
+
+print(df['LanguageWorkedWith'].str.contains('python', case = False).fillna(False))
+
+filt = df.loc[df['LanguageWorkedWith'].str.contains('python', case = False).fillna(False)]
+
+print(filt['Country'].value_counts().sort_values())
+
+print(df.groupby(by='Country')['LanguageWorkedWith'].apply(lambda x: x.str.contains('Python').sum()))
+
+print(df.groupby(by='Country')['LanguageWorkedWith'].apply(lambda x: x.str.contains('Python').value_counts()))
+
+print(df.groupby(by='Country')['LanguageWorkedWith'].apply(lambda x: x.str.contains('Python').value_counts(normalize = True))['Country'] == 'United States')
+
+print(type(df.groupby(by='Country')['LanguageWorkedWith'].apply(lambda x: x.str.contains('Python').value_counts(normalize = True))))
+
+print((df.groupby(by='Country')['LanguageWorkedWith'].apply(lambda x: x.str.contains('Python').value_counts(normalize = True))) 
+      .loc['Yemen'])
+
+
+print(people_df, '\n')
+
+print(people_df.dropna(how='all'))
+
+print(people_df.dropna(axis=1, how='all'))
+
+print(people_df.dropna(axis=0, how='all', subset=['first', 'email']))
+
+people_df.replace(to_replace=['NA', 'Missing', 'None'], value = np.nan, inplace=True)
+print(people_df)
+
+print(people_df.dropna(axis=1, how='all', subset=[4,6]))
+
+print(~people_df['first'].isna())
+
+print(people_df.loc[~people_df['first'].isna()])
+
+print(people_df['first'].fillna('Test'))
+
+print(people_df.fillna('Test', axis=1))
+
+new_df = people_df
+new_df['New_column'] = 1.00
+print(new_df)
+
+print(new_df['New_column'].dtypes)
+
+n = new_df.astype({'age': 'Int64', 'New_column': 'Int64'})
+
+print(n)
+
+print(df.columns)
+
+print(df['YearsCode'])
+
+print(df['YearsCode'].value_counts())
+
+print(df['YearsCode'].unique())
+
+df['YearsCode'] = df['YearsCode'].replace({'Less than 1 year': 0.9, 'More than 50 years': 51})
+
+print(df['YearsCode'].value_counts())
+
+df['YearsCode'] = df['YearsCode'].astype('float64')
+
+print(df['YearsCode'].mean())
+
+
+
+crypto_df = pd.read_csv('ETH_1h.csv')
+print(crypto_df.head())
+
+crypto_df['Date'] = pd.to_datetime(crypto_df['Date'], format ='%Y-%m-%d %I-%p')
+
+print(crypto_df.head())
+
+print(crypto_df.loc[0, 'Date'].day_name())
+
+print(crypto_df['Date'].dt.day_name())
+
+print(crypto_df['Date'].min())
+print(crypto_df['Date'].max())
+
+print(crypto_df['Date'].min() - crypto_df['Date'].max())
+
+print(crypto_df.loc[crypto_df['Date'] == '2019'])
+
+print(crypto_df['Date'] >= pd.to_datetime('2020-01-01') & crypto_df['Date'] < pd.to_datetime(pd.to_datetime('2020-03-01')))
+
+print(small_df, '\n')
+
+small_df.to_excel('Test_one.xlsx')
+
+small_df.to_json('Test_two.json')
+
+small_df.to_json('Test_four.json', orient='records', lines=True)
+
+new_df = pd.read_json('Test_two.json')
+
+print(new_df)
+
+new_df_two = pd.read_json('Test_four.json', lines=True)
+
+print(new_df_two)
+'''
+
+with open('Test_three.json') as my_file:
+    f = my_file.read()
+
+print(f)
